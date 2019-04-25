@@ -1,10 +1,7 @@
 'use strict';
+
 require('dotenv').config();
-const { Client } = require('pg');
-const client = new Client();
-client.connect();
-
-
+const cors = require('cors');
 const superagent = require('superagent');
 const express = require('express'),
   app = express(),
@@ -12,6 +9,12 @@ const express = require('express'),
   WEATHER_API_KEY = process.env.WEATHER_API_KEY,
   GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
 
+app.use(cors());
+
+const { Client } = require('pg');
+const client = new Client();
+client.connect();
+client.on('err', err => console.log(err));
 
 
 client.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
@@ -20,17 +23,13 @@ client.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
 });
 
 
-
-
-
-
 // CREATE LOCATION ROUTE
 app.get('/location', (req, res) => {
   console.log('/location works');
   try {
     // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
     const locationData = searchToLatLong(req.query.data, res);
-  } catch(err) {
+  } catch (err) {
     errorHandler(res, 500, 'Please enter a valid locations!');
   }
 });
@@ -40,7 +39,7 @@ app.get('/weather', (req, res) => {
   try {
     // STORE THE USER'S QUERY LOCATION
     const weatherData = getWeather(req, res);
-  } catch(err) {
+  } catch (err) {
     errorHandler(res, 500, 'Please enter a valid location!');
   }
 });
@@ -101,7 +100,7 @@ const getWeather = (request, response) => {
   return superagent.get(url)
     .then(res => {
       console.log(res.body);
-      const weatherSummaries =[];
+      const weatherSummaries = [];
       res.body.daily.data.forEach(day => {
         weatherSummaries.push(new Weather(day));
       });
