@@ -30,7 +30,7 @@ app.get('/location', (req, res) => {
     // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
     const locationData = searchToLatLong(req.query.data, res);
   } catch(err) {
-    errorHandler(res, 500, 'Please enter a valid location!');
+    errorHandler(res, 500, 'Please enter a valid locations!');
   }
 });
 
