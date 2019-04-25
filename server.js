@@ -26,6 +26,7 @@ client.query('SELECT $1::text as message', ['Hello world!'], (err, res) => {
 
 // CREATE LOCATION ROUTE
 app.get('/location', (req, res) => {
+  console.log("/location");
   try {
     // STORE THE USER'S QUERY-TURNED-LOCATION-OBJECT IN LOCATIONDATA
     const locationData = searchToLatLong(req.query.data, res);
