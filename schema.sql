@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS weather;
+DROP TABLE IF EXISTS weathers;
 DROP TABLE IF EXISTS locations;
 
 -- each specific location will be a row
@@ -12,7 +12,7 @@ CREATE TABLE locations (
   longitude NUMERIC(10, 7)
 );
 
-CREATE TABLE weather (
+CREATE TABLE weathers (
   id SERIAL PRIMARY KEY,
   forecast VARCHAR(255),
   time VARCHAR(255),
