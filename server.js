@@ -6,9 +6,10 @@ const superagent = require('superagent');
 const { Client } = require('pg');
 const express = require('express'),
   app = express(),
-  PORT = process.env.PORT || 3000,
+  PORT = process.env.PORT || 4000,
   WEATHER_API_KEY = process.env.WEATHER_API_KEY,
-  GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
+  GEOCODE_API_KEY = process.env.GEOCODE_API_KEY,
+  MOVIE_DB_API_KEY = process.env.MOVIE_DB_API_KEY;
 
 app.use(cors());
 
@@ -31,6 +32,9 @@ function handleError(err, res) {
 app.get('/location', getLocation);
 // CREATE WEATHER ROUTE
 app.get('/weather', getWeather);
+//-----------------CREATE MOVIES ROUTE--------------------------
+app.get('/movies', getMovie);
+
 
 function getLocation(request, response) {
   const locationHandler = {
@@ -175,5 +179,76 @@ Weather.fetch = function (location) {
     });
 };
 
+///-----------------MOVIES--------------------------
 
+function getMovie(request, response) {
+  const movieHandler = {
+
+    query: request.query.data,
+
+    cacheHit: (results) => {
+      console.log('Got movie data from SQL');
+      response.send(results.rows[0]);
+    },
+
+    cacheMiss: () => {
+      Movie.fetchMovie(request.query.data)
+        .then(data => response.send(data));
+    }
+  };
+  Movie.lookupMovie(movieHandler);
+}
+// [
+//   {
+//     "title": "Sleepless in Seattle",
+//     "overview": "A young boy who tries to set his dad up on a date after the death of his mother. He calls into a radio station to talk about his dad’s loneliness which soon leads the dad into meeting a Journalist Annie who flies to Seattle to write a story about the boy and his dad. Yet Annie ends up with more than just a story in this popular romantic comedy.",
+//     "average_votes": "6.60",
+//     "total_votes": "881",
+//     "image_url": "https://image.tmdb.org/t/p/w200_and_h300_bestv2/afkYP15OeUOD0tFEmj6VvejuOcz.jpg",
+//     "popularity": "8.2340",
+//     "released_on": "1993-06-24"
+//   }
+// ]
+//Movie Constructor
+function Movie(query, data){
+  this.title = query;
+  this.overview = data;
+  this.average_votes = data;
+  this.total_votes = data;
+  this.image_url = data;
+  this.popularity =data;
+  this.released_on = data;
+}
+// STATIC METHOD
+Movie.lookupMovie = (handler) => {
+  let SQL = `SELECT * FROM movies WHERE location_id=$1`;
+  let values = [handler.query];
+
+  return client.query(SQL, values)
+    .then(results => {
+      if (results.rowCount > 0) {
+        handler.cacheHit(results);
+      }
+      else {
+        handler.cacheMiss();
+      }
+    })
+    .catch(console.error);
+};
+
+//Movie API CAll
+Movie.fetchMovie = function (location) {
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_DB_API_KEY}&query=Jack+Reacher`;
+
+  return superagent.get(url)
+    .then(result => {
+      console.log(result);
+      const weatherSummaries = result.body.daily.data.map(day => {
+        const summary = new Weather(day);
+        summary.save(location.id);
+        return summary;
+      });
+      return weatherSummaries;
+    });
+};
 app.listen(PORT, () => console.log(`App is up on ${PORT}`));
