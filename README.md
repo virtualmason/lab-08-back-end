@@ -1,4 +1,13 @@
 # Project Name
+Number and name of feature: ____Add SQL TO Project____________________________
+
+Estimate of time needed to complete: _6____
+
+Start time: ___9:00__
+
+Finish time: __11:30___
+
+Actual time needed to complete: _2:30____
 
 **Author**: Your Name Goes Here
 **Version**: 1.0.0 (increment the patch/fix version number if you make more commits past your first submission)

@@ -9,7 +9,8 @@ CREATE TABLE locations (
   search_query VARCHAR(255),
   formatted_query VARCHAR(255),
   latitude NUMERIC(10, 7),
-  longitude NUMERIC(10, 7)
+  longitude NUMERIC(10, 7),
+  created_at BIGINT
 );
 
 CREATE TABLE weathers (
@@ -17,5 +18,6 @@ CREATE TABLE weathers (
   forecast VARCHAR(255),
   time VARCHAR(255),
   location_id INTEGER NOT NULL,
-  FOREIGN KEY(location_id) REFERENCES locations (id)
+  FOREIGN KEY(location_id) REFERENCES locations (id),
+  created_at BIGINT
 );
