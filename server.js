@@ -31,6 +31,12 @@ function handleError(err, res) {
 app.get('/location', getLocation);
 // CREATE WEATHER ROUTE
 app.get('/weather', getWeather);
+// CREATE MOVIE ROUTE
+app.get('/movies', getMovies);
+
+function getMovies(request, response) {
+
+}
 
 function getLocation(request, response) {
   const locationHandler = {
