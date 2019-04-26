@@ -33,10 +33,29 @@ app.get('/location', getLocation);
 app.get('/weather', getWeather);
 // CREATE MOVIE ROUTE
 app.get('/movies', getMovies);
+// CREATE YELP ROUTE
+app.get('/yelp', getYelp);
+
+// MOVIE --------------------------------------------------------------------
 
 function getMovies(request, response) {
 
 }
+
+function Movie(query, data) {
+
+}
+
+// YELP -------------------------------------------------------------------------
+
+function getYelp(request, response) {
+
+}
+
+function Movie(query, data) {
+
+}
+
 
 function getLocation(request, response) {
   const locationHandler = {
