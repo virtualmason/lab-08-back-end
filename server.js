@@ -242,13 +242,13 @@ Movie.fetchMovie = function (location) {
 
   return superagent.get(url)
     .then(result => {
-      console.log(result);
-      const weatherSummaries = result.body.daily.data.map(day => {
+      console.log('line 244 data',result.text);
+      const moviesSummaries = result.body.daily.data.map(day => {
         const summary = new Weather(day);
         summary.save(location.id);
         return summary;
       });
-      return weatherSummaries;
+      return moviesSummaries;
     });
 };
 app.listen(PORT, () => console.log(`App is up on ${PORT}`));
