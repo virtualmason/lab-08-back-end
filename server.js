@@ -236,16 +236,26 @@ Movie.lookupMovie = (handler) => {
     .catch(console.error);
 };
 
+//Instance Method : Save Movie to the DB
+Movie.prototype.save = function(id) {
+  const SQL = 'INSERT INTO movies(location_id,title, overview, average_votes,total_votes, image_url, popularity, released_on, created_at ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9);';
+  const values = Object.values(this);
+  values.push(id);
+  return client.query(SQL, values);
+};
+
 //Movie API CAll
-Movie.fetchMovie = function (location) {
+Movie.fetchMovie = function (choice) {
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_DB_API_KEY}&query=Jack+Reacher`;
 
   return superagent.get(url)
     .then(result => {
-      console.log('line 244 data',result.text);
-      const moviesSummaries = result.body.daily.data.map(day => {
-        const summary = new Weather(day);
-        summary.save(location.id);
+      //console.log('line 244 data+++++',result.body.results);
+      const moviesSummaries = result.body.results.map(info => {
+
+        const summary = new Movie(info);
+        console.log("line 251", summary);
+        summary.save(choice.id);
         return summary;
       });
       return moviesSummaries;
