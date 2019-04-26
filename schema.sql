@@ -13,7 +13,8 @@ CREATE TABLE locations (
   search_query VARCHAR(255),
   formatted_query VARCHAR(255),
   latitude NUMERIC(10, 7),
-  longitude NUMERIC(10, 7)
+  longitude NUMERIC(10, 7),
+  created_at BIGINT
 );
 
 CREATE TABLE weathers (
@@ -36,4 +37,5 @@ CREATE TABLE movies (
   created_at BIGINT,
   location_id INTEGER NOT NULL REFERENCES locations(id) 
 );
+
 

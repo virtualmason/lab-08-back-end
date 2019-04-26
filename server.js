@@ -118,6 +118,7 @@ function getWeather(request, response) {
     location: request.query.data,
 
     cacheHit: function (result) {
+      // add created_at
       response.send(result.rows);
     },
 
