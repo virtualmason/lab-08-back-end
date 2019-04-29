@@ -33,7 +33,7 @@ app.get('/location', getLocation);
 // CREATE WEATHER ROUTE
 app.get('/weather', getWeather);
 //-----------------CREATE MOVIES ROUTE--------------------------
-app.get('/movies', getMovie);
+app.get('/movies', getMovie); //line 184
 
 
 function getLocation(request, response) {
@@ -182,9 +182,11 @@ Weather.fetch = function (location) {
 ///-----------------MOVIES--------------------------
 
 function getMovie(request, response) {
+  //line 261 choice
+  console.log(' (line 185)/?data=Jack+Reacher: ', request.query.query);
   const movieHandler = {
 
-    query: request.query.data,
+    query: request.query.query,
 
     cacheHit: (results) => {
       console.log('Got movie data from SQL');
@@ -192,11 +194,12 @@ function getMovie(request, response) {
     },
 
     cacheMiss: () => {
-      Movie.fetchMovie(request.query.data)
+      console.log(' line 197');
+      Movie.fetchMovie(request.query.query) //l 259
         .then(data => response.send(data));
     }
   };
-  Movie.lookupMovie(movieHandler);
+  Movie.lookupMovie(movieHandler); //line 233
 }
 // [
 //   {
@@ -210,27 +213,39 @@ function getMovie(request, response) {
 //   }
 // ]
 //Movie Constructor
+// id SERIAL PRIMARY KEY,
+// title VARCHAR(255),
+// overview VARCHAR(1000),
+// vote_average NUMERIC(4,2),
+// vote_count INTEGER,
+// poster_path VARCHAR(255),
+// popularity NUMERIC(6,4),
+// release_date CHAR(10),
+// created_at BIGINT,
+// location_id INTEGER NOT NULL REFERENCES locations(id)
+//Line 271
 function Movie(query, data){
   this.title = query;
   this.overview = data;
-  this.average_votes = data;
-  this.total_votes = data;
-  this.image_url = data;
+  this.vote_average = data;
+  this.vote_count = data;
   this.popularity =data;
-  this.released_on = data;
+  this.release_date = data;
 }
+
 // STATIC METHOD
 Movie.lookupMovie = (handler) => {
   let SQL = `SELECT * FROM movies WHERE location_id=$1`;
   let values = [handler.query];
-
-  return client.query(SQL, values)
+  console.log(' line 239', handler.query);
+  return client.query(SQL, values) // do I need a return here? -error: invalid input syntax for integer: "Jack Reacher"
     .then(results => {
       if (results.rowCount > 0) {
+        console.log('line 243');
         handler.cacheHit(results);
       }
       else {
-        handler.cacheMiss();
+        handler.cacheMiss(); //Line 194
       }
     })
     .catch(console.error);
@@ -238,7 +253,7 @@ Movie.lookupMovie = (handler) => {
 
 //Instance Method : Save Movie to the DB
 Movie.prototype.save = function(id) {
-  const SQL = 'INSERT INTO movies(location_id,title, overview, average_votes,total_votes, image_url, popularity, released_on, created_at ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9);';
+  const SQL = 'INSERT INTO movies(location_id,title, overview, vote_average ,vote_count, image_url, popularity, release_date, created_at ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9);';
   const values = Object.values(this);
   values.push(id);
   return client.query(SQL, values);
@@ -246,19 +261,25 @@ Movie.prototype.save = function(id) {
 
 //Movie API CAll
 Movie.fetchMovie = function (choice) {
+  //console.log('line 261', choice);// choice is undefined
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_DB_API_KEY}&query=Jack+Reacher`;
+  //const url = `https://api.themoviedb.org/3/search/movie?api_key=${MOVIE_DB_API_KEY}&query=${choice}`;
 
   return superagent.get(url)
     .then(result => {
-      //console.log('line 244 data+++++',result.body.results);
-      const moviesSummaries = result.body.results.map(info => {
 
-        const summary = new Movie(info);
-        console.log("line 251", summary);
+      //Create an instance and save it
+      var moviesSummaries = result.body.results[0].map(info => {
+        const summary = new Movie(info);//Line 223
+        console.log('this is your movie object line 274: ', summary);
         summary.save(choice.id);
         return summary;
       });
       return moviesSummaries;
+
     });
+  //cant change var to let?
+
+
 };
 app.listen(PORT, () => console.log(`App is up on ${PORT}`));
